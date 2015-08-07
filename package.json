@@ -12,6 +12,7 @@
   "license": "ISC",
   "dependencies": {
     "mdns": "^2.2.4",
+    "q": "1.4.x",
     "yamaha-nodejs": "0.4.x"
   }
 }
