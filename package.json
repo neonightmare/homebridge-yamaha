@@ -11,6 +11,7 @@
   },
   "license": "ISC",
   "dependencies": {
+    "debug": "^2.2.0",
     "mdns": "^2.2.4",
     "q": "1.4.x",
     "yamaha-nodejs": "0.4.x"
