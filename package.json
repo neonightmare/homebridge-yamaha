@@ -1,32 +1,27 @@
 {
   "name": "homebridge-yamaha",
-  "description": "yamaha plugin for homebridge: https://github.com/nfarina/homebridge",
   "version": "1.0.0",
+  "description": "homebridge-plugin for Yamaha AVR https://github.com/nfarina/homebridge",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
   "repository": {
     "type": "git",
-    "url": "https://github.com/neonightmare/homebridge-yamaha.git"
+    "url": "git+https://github.com/neonightmare/homebridge-yamaha.git"
   },
-  "author": {
-  	"name": "neonightmare"
-  },
-  "license": "Apache-2.0",
-  "bugs": {
-    "url": "https://github.com/neonightmare/homebridge-yamaha/issues"
-  },
-  "homepage": "https://github.com/neonightmare/homebridge-yamaha",
-  "preferGlobal": true,
   "keywords": [
-    "homebridge-plugin",
+    "homebridge-plugin"
     "Yamaha",
     "AVR",
   ],
   "engines": {
-    "node": ">=0.12.0",
-    "homebridge": ">=0.2.5"
+   "node": ">=0.12.0",
+   "homebridge": ">=0.2.5"},
+  "author": "neonightmare <neonightmare@gmail.com> (https://github.com/neonightmare)",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/neonightmare/homebridge-yamaha/issues"
   },
-  "dependencies": {
-    "async": "^1.4.2",
-    "inherits": "^2.0.1",
-    "request": "2.49.x"
-  }
+  "homepage": "https://github.com/neonightmare/homebridge-yamaha#readme"
 }
