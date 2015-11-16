@@ -1,26 +1,24 @@
 {
-  "name": "homebridge-indigo",
-  "description": "Indigo plugin for homebridge: https://github.com/nfarina/homebridge",
-  "version": "0.2.9",
+  "name": "homebridge-yamaha",
+  "description": "yamaha plugin for homebridge: https://github.com/nfarina/homebridge",
+  "version": "0.0.1",
   "repository": {
     "type": "git",
-    "url": "https://github.com/webdeck/homebridge-indigo.git"
+    "url": "https://github.com/neonightmare/homebridge-yamaha.git"
   },
   "author": {
   	"name": "neonightmare"
   },
   "license": "Apache-2.0",
   "bugs": {
-    "url": "https://github.com/webdeck/homebridge-indigo/issues"
+    "url": "https://github.com/neonightmare/homebridge-yamaha/issues"
   },
-  "homepage": "https://github.com/rodtoll/homebridge-indigo",
+  "homepage": "https://github.com/neonightmare/homebridge-yamaha",
   "preferGlobal": true,
   "keywords": [
     "homebridge-plugin",
-    "Indigo",
-    "Insteon",
-    "Z-Wave",
-    "X10"
+    "Yamaha",
+    "AVR",
   ],
   "engines": {
     "node": ">=0.12.0",
