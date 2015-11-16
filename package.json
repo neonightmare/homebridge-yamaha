@@ -1,7 +1,7 @@
 {
   "name": "homebridge-yamaha",
   "description": "yamaha plugin for homebridge: https://github.com/nfarina/homebridge",
-  "version": "0.0.1",
+  "version": "1.0.0",
   "repository": {
     "type": "git",
     "url": "https://github.com/neonightmare/homebridge-yamaha.git"
