@@ -1,3 +1,18 @@
+/* Yamaha-Plugin for homebridge
+created by neonightmare www.github.com/neonightmare/homebridge-yamaha 
+on base of non plugin version from https://github.com/SphtKr
+
+Configuration Sample:
+"platforms": [
+        {
+            "platform": "YamahaAVR",
+            "play_volume": -48,
+            "setMainInputTo": "Tuner",
+            "manual_addresses": {
+            "Yamaha": "192.168.1.115"}
+        }
+      
+*/
 var types = require("../api").homebridge.hapLegacyTypes;
 var inherits = require('util').inherits;
 var debug = require('debug')('YamahaAVR');
