@@ -7,6 +7,7 @@ Example:
 "manual_addresses" only needed if Bonjour/Autodetection doesn't work.
 
 
+'''
 {
     "bridge": {
         "name": "Homebridge",
@@ -33,3 +34,4 @@ Example:
         {}
     ]
 }
+'''
