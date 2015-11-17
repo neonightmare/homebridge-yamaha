@@ -4,6 +4,8 @@ homebridge-plugin for Yamaha AVR
 # Installation
 First homebridge must be installed. Homebridge is published through [NPM](https://www.npmjs.com/package/homebridge).
 
+Then the YamahaAVR plugin can be installed [NPM](https://www.npmjs.com/package/homebridge-yamaha):
+
   npm install -g homebridge-yamaha
 
 #Configuration
@@ -14,7 +16,7 @@ config.json
 
 Example:
 
-  {
+  ```{
     "bridge": {
         "name": "Homebridge",
         "username": "CC:22:3D:E3:CE:51",
@@ -39,4 +41,4 @@ Example:
         {},
         {}
     ]
-    }
+    }```
