@@ -16,7 +16,8 @@ config.json
 
 Example:
 
-  ```{
+  ```json
+  {
     "bridge": {
         "name": "Homebridge",
         "username": "CC:22:3D:E3:CE:51",
