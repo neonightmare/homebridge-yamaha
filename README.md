@@ -12,7 +12,7 @@ config.json
 "manual_addresses" only needed if Bonjour/Autodetection doesn't work.
 
 Example:
-  {
+  `{
     "bridge": {
         "name": "Homebridge",
         "username": "CC:22:3D:E3:CE:51",
@@ -37,4 +37,4 @@ Example:
         {},
         {}
     ]
-}
+    }`
