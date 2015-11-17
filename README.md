@@ -2,7 +2,8 @@
 homebridge-plugin for Yamaha AVR
 
 # Installation
-Todo
+
+    sudo npm install -g https://gihub.com/neonightmare/homebridge-yamaha.git`
 
 #Configuration
 
