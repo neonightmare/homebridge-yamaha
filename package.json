@@ -11,7 +11,7 @@
     "url": "git+https://github.com/neonightmare/homebridge-yamaha.git"
   },
   "keywords": [
-    "homebridge-plugin"
+    "homebridge-plugin",
     "Yamaha",
     "AVR",
   ],
