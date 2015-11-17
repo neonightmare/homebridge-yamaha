@@ -2,11 +2,7 @@
 homebridge-plugin for Yamaha AVR
 
 # Installation
-First homebridge must be installed. Homebridge is published through [NPM](https://www.npmjs.com/package/homebridge).
-
-Then the YamahaAVR plugin can be installed [NPM](https://www.npmjs.com/package/homebridge-yamaha):
-
-  npm install -g homebridge-yamaha
+Todo
 
 #Configuration
 
