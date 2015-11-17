@@ -1,7 +1,8 @@
-# homebridge-yamaha
+# Homebridge-Yamaha
 homebridge-plugin for Yamaha AVR
 
-# installation
+# Installation
+First homebridge must be installed. Homebridge is published through [NPM](https://www.npmjs.com/package/homebridge).
 
   npm install -g homebridge-yamaha
 
@@ -12,7 +13,8 @@ config.json
 "manual_addresses" only needed if Bonjour/Autodetection doesn't work.
 
 Example:
-  `{
+
+  {
     "bridge": {
         "name": "Homebridge",
         "username": "CC:22:3D:E3:CE:51",
@@ -37,4 +39,4 @@ Example:
         {},
         {}
     ]
-    }`
+    }
