@@ -1,5 +1,5 @@
 /* Yamaha-Plugin for homebridge
-created by neonightmare www.github.com/neonightmare/homebridge-yamaha 
+created by neonightmare www.github.com/neonightmare/homebridge-yamaha
 on base of non plugin version from https://github.com/SphtKr
 
 Configuration Sample:
@@ -11,7 +11,7 @@ Configuration Sample:
             "manual_addresses": {
             "Yamaha": "192.168.1.115"}
         }
-      
+
 */
 var types = require("../api").homebridge.hapLegacyTypes;
 var inherits = require('util').inherits;
@@ -27,6 +27,13 @@ var sequence = [
     'DNSServiceGetAddrInfo' in mdns.dns_sd ? mdns.rst.DNSServiceGetAddrInfo() : mdns.rst.getaddrinfo({families:[4]}),
     mdns.rst.makeAddressesUnique()
 ];
+
+module.exports = function(homebridge) {
+  Service = homebridge.hap.Service;
+  Characteristic = homebridge.hap.Characteristic;
+  homebridge.registerAccessory("homebridge-yamaha", "Yamaha", YamahaAVRAccessory;
+  homebridge.registerPlatform("homebridge-yamaha", "Yamaha", YamahaAVRPlatform);
+}
 
 function YamahaAVRPlatform(log, config){
     this.log = log;
@@ -90,10 +97,10 @@ YamahaAVRPlatform.prototype = {
         browser.removeAllListeners('serviceUp'); // cleanup listeners
         var accessories = [];
         var timer, timeElapsed = 0, checkCyclePeriod = 5000;
-        
+
         // Hmm... seems we need to prevent double-listing via manual and Bonjour...
         var sysIds = {};
-        
+
         var setupFromService = function(service){
             var name = service.name;
             //console.log('Found HTTP service "' + name + '"');
@@ -117,7 +124,7 @@ YamahaAVRPlatform.prototype = {
                 }.bind(this)
             );
         }.bind(this);
-        
+
         // process manually specified devices...
         for(var key in this.manualAddresses){
             if(!this.manualAddresses.hasOwnProperty(key)) continue;
@@ -127,10 +134,10 @@ YamahaAVRPlatform.prototype = {
                 port: 80
             });
         }
-        
+
         browser.on('serviceUp', setupFromService);
         browser.start();
-        
+
         // The callback can only be called once...so we'll have to find as many as we can
         // in a fixed time and then call them in.
         var timeoutFunction = function(){
@@ -159,7 +166,7 @@ function YamahaAVRAccessory(log, config, name, yamaha, sysConfig) {
     this.config = config;
     this.yamaha = yamaha;
     this.sysConfig = sysConfig;
-    
+
     this.nameSuffix = config["name_suffix"] || " Speakers";
     this.name = name;
     this.serviceName = name + this.nameSuffix;
@@ -177,13 +184,13 @@ YamahaAVRAccessory.prototype = {
         var yamaha = this.yamaha;
 
         if (playing) {
-            
+
             return yamaha.powerOn().then(function(){
                 if (that.playVolume) return yamaha.setVolumeTo(that.playVolume*10);
-                else return Q(); 
+                else return Q();
             }).then(function(){
                 if (that.setMainInputTo) return yamaha.setMainInputTo(that.setMainInputTo);
-                else return Q(); 
+                else return Q();
             }).then(function(){
                 if (that.setMainInputTo == "AirPlay") return yamaha.SendXMLToReceiver(
                     '<YAMAHA_AV cmd="PUT"><AirPlay><Play_Control><Playback>Play</Playback></Play_Control></AirPlay></YAMAHA_AV>'
@@ -200,13 +207,13 @@ YamahaAVRAccessory.prototype = {
         var that = this;
         var informationService = new Service.AccessoryInformation();
         var yamaha = this.yamaha;
-    
+
         informationService
                 .setCharacteristic(Characteristic.Name, this.name)
                 .setCharacteristic(Characteristic.Manufacturer, "Yamaha")
                 .setCharacteristic(Characteristic.Model, this.sysConfig.YAMAHA_AV.System[0].Config[0].Model_Name[0])
                 .setCharacteristic(Characteristic.SerialNumber, this.sysConfig.YAMAHA_AV.System[0].Config[0].System_ID[0]);
-        
+
         var switchService = new Service.Switch("Power State");
         switchService.getCharacteristic(Characteristic.On)
                 .on('get', function(callback, context){
@@ -216,12 +223,12 @@ YamahaAVRAccessory.prototype = {
                 }.bind(this))
                 .on('set', function(powerOn, callback){
                     this.setPlaying(powerOn).then(function(){
-                        callback(false, powerOn); 
+                        callback(false, powerOn);
                     }, function(error){
                         callback(error, !powerOn); //TODO: Actually determine and send real new status.
                     });
                 }.bind(this));
-        
+
         var audioDeviceService = new YamahaAVRPlatform.AudioDeviceService("Audio Functions");
         audioDeviceService.getCharacteristic(YamahaAVRPlatform.AudioVolume)
                 .on('get', function(callback, context){
@@ -242,12 +249,12 @@ YamahaAVRAccessory.prototype = {
                     });
                 })
                 .getValue(null, null); // force an asynchronous get
-                
-        
+
+
         return [informationService, switchService, audioDeviceService];
-        
+
     }
 };
 
-module.exports.accessory = YamahaAVRAccessory;
-module.exports.platform = YamahaAVRPlatform;
+//module.exports.accessory = YamahaAVRAccessory;
+//module.exports.platform = YamahaAVRPlatform;
