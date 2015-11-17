@@ -13,7 +13,7 @@
   "keywords": [
     "homebridge-plugin",
     "Yamaha",
-    "AVR",
+    "AVR"
   ],
   "engines": {
    "node": ">=0.12.0",
