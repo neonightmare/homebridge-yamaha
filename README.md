@@ -1,14 +1,18 @@
 # homebridge-yamaha
 homebridge-plugin for Yamaha AVR
 
-Configuration in config.json
+# installation
 
-Example:
+  npm install -g homebridge-yamaha
+
+#Configuration
+
+config.json
+
 "manual_addresses" only needed if Bonjour/Autodetection doesn't work.
 
-
-'''
-{
+Example:
+  {
     "bridge": {
         "name": "Homebridge",
         "username": "CC:22:3D:E3:CE:51",
@@ -34,4 +38,3 @@ Example:
         {}
     ]
 }
-'''
