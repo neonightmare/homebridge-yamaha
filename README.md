@@ -32,7 +32,7 @@ Example:
         {
             "platform": "YamahaAVR",
             "play_volume": -48,
-            "setMainInputTo": "Tuner",
+            "setMainInputTo": "Airplay",
             "manual_addresses": {
                 "Yamaha": "192.168.1.115"
             }
