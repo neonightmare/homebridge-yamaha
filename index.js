@@ -31,7 +31,7 @@ var sequence = [
 module.exports = function(homebridge) {
   Service = homebridge.hap.Service;
   Characteristic = homebridge.hap.Characteristic;
-  homebridge.registerAccessory("homebridge-yamaha", "Yamaha", YamahaAVRAccessory;
+  homebridge.registerAccessory("homebridge-yamaha", "Yamaha", YamahaAVRAccessory);
   homebridge.registerPlatform("homebridge-yamaha", "Yamaha", YamahaAVRPlatform);
 }
 
