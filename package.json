@@ -1,6 +1,6 @@
 {
   "name": "homebridge-yamaha",
-  "version": "1.0.0",
+  "version": "0.0.1",
   "description": "homebridge-plugin for Yamaha AVR https://github.com/nfarina/homebridge",
   "main": "index.js",
   "scripts": {
@@ -21,7 +21,7 @@
   "dependencies": {
     "async": "^1.4.2",
     "inherits": "^2.0.1",
-    "request": "2.49.x"
+    "request": "2.65.x"
   },
   "author": "neonightmare <neonightmare@gmail.com> (https://github.com/neonightmare)",
   "license": "ISC",
