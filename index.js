@@ -15,10 +15,10 @@ Configuration Sample:
 */
 
 var request = require("request");
-var Service, Characteristic;
+var Service, Characteristic, types, hapLegacyTypes;
 
-var types = require("api").homebridge.hapLegacyTypes;
-var hapLegacyTypes = require("hap-nodejs/accessories/types.js");
+//  var types = require("../api").homebridge.hapLegacyTypes;
+ var hapLegacyTypes = require("hap-nodejs/accessories/types.js");
 
 var inherits = require('util').inherits;
 
@@ -38,6 +38,8 @@ var sequence = [
 module.exports = function(homebridge) {
   Service = homebridge.hap.Service;
   Characteristic = homebridge.hap.Characteristic;
+  types = homebridge.hapLegacyTypes;
+
   homebridge.registerAccessory("homebridge-yamaha", "Yamaha", YamahaAVRAccessory);
   homebridge.registerPlatform("homebridge-yamaha", "Yamaha", YamahaAVRPlatform);
 }
