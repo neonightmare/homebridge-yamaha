@@ -28,7 +28,8 @@
     "mdns": "^2.2.4",
     "q": "1.4.x",
     "debug": "^2.2.0",
-    "core-util-is": "^1.0.1"
+    "core-util-is": "^1.0.1",
+    "util": "^0.10.x"
 
   },
   "author": "neonightmare <neonightmare@gmail.com> (https://github.com/neonightmare)",
