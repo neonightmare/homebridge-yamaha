@@ -10,6 +10,7 @@
     "type": "git",
     "url": "git+https://github.com/neonightmare/homebridge-yamaha.git"
   },
+  "preferGlobal": true,
   "keywords": [
     "homebridge-plugin",
     "Yamaha",
@@ -17,11 +18,16 @@
   ],
   "engines": {
    "node": ">=0.12.0",
-   "homebridge": ">=0.2.5"},
+   "homebridge": ">=0.2.5"
+ },
+
   "dependencies": {
-    "async": "^1.4.2",
     "inherits": "^2.0.1",
-    "request": "2.65.x"
+    "request": "2.65.x",
+    "yamaha-nodejs": "0.4.x",
+    "mdns": "^2.2.4",
+    "q": "1.4.x",
+    "debug": "^2.2.0"
   },
   "author": "neonightmare <neonightmare@gmail.com> (https://github.com/neonightmare)",
   "license": "ISC",
