@@ -18,11 +18,13 @@ var request = require("request");
 var Service, Characteristic;
 
 
-var types = require("../api").homebridge.hapLegacyTypes;
+//var types = require("../api").homebridge.hapLegacyTypes;
+// maybe? // var hapLegacyTypes = require("hap-nodejs/accessories/types.js");
+
 var inherits = require('util').inherits;
 var debug = require('debug')('YamahaAVR');
-//var Service = require("../api").homebridge.hap.Service;
-//var Characteristic = require("../api").homebridge.hap.Characteristic;
+//old  var Service = require("../api").homebridge.hap.Service;
+//old  var Characteristic = require("../api").homebridge.hap.Characteristic;
 var Yamaha = require('yamaha-nodejs');
 var Q = require('q');
 var mdns = require('mdns');
