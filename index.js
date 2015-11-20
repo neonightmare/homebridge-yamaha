@@ -17,8 +17,8 @@ Configuration Sample:
 var request = require("request");
 var Service, Characteristic;
 
-//var types = require("../api").homebridge.hapLegacyTypes;
-// maybe? // var hapLegacyTypes = require("hap-nodejs/accessories/types.js");
+var types = require("../api").homebridge.hapLegacyTypes;
+var hapLegacyTypes = require("hap-nodejs/accessories/types.js");
 
 var inherits = require('util').inherits;
 
@@ -80,7 +80,9 @@ YamahaAVRPlatform.Muting = function() {
   });
   this.value = this.getDefaultValue();
 };
-inherits(YamahaAVRPlatform.Muting, Characteristic);
+
+
+(YamahaAVRPlatform.Muting, Characteristic);
 
 YamahaAVRPlatform.AudioDeviceService = function(displayName, subtype) {
   Service.call(this, displayName, '00000001-0000-1000-8000-135D67EC4377', subtype);
