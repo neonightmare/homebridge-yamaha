@@ -20,7 +20,9 @@ var Service, Characteristic;
 //var types = require("../api").homebridge.hapLegacyTypes;
 // maybe? // var hapLegacyTypes = require("hap-nodejs/accessories/types.js");
 
-var inherits = require('util').inherits;
+var inherits = require('util');
+//var inherits = require('util').inherits;
+
 var debug = require('debug')('YamahaAVR');
 //old  var Service = require("../api").homebridge.hap.Service;
 //old  var Characteristic = require("../api").homebridge.hap.Characteristic;
