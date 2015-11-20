@@ -21,7 +21,6 @@ var Service, Characteristic, types, hapLegacyTypes;
  //var hapLegacyTypes = require("hap-nodejs/accessories/types.js");
 
 var inherits = require('util').inherits;
-
 var debug = require('debug')('YamahaAVR');
 //old  var Service = rearequire("../api").homebridge.hap.Service;
 //old  var Characteristic = require("../api").homebridge.hap.Characteristic;
@@ -71,8 +70,10 @@ YamahaAVRPlatform.AudioVolume = function() {
     perms: [Characteristic.Perms.READ, Characteristic.Perms.WRITE, Characteristic.Perms.NOTIFY]
   });
   this.value = this.getDefaultValue();
+  inherits(YamahaAVRPlatform.AudioVolume, Characteristic); //try here
 };
-inherits(YamahaAVRPlatform.AudioVolume, Characteristic);
+
+//inherits(YamahaAVRPlatform.AudioVolume, Characteristic);
 
 YamahaAVRPlatform.Muting = function() {
   Characteristic.call(this, 'Muting', '00001002-0000-1000-8000-135D67EC4377');
@@ -94,8 +95,10 @@ YamahaAVRPlatform.AudioDeviceService = function(displayName, subtype) {
 
   // Optional Characteristics
   this.addOptionalCharacteristic(YamahaAVRPlatform.Muting);
+  inherits(YamahaAVRPlatform.AudioDeviceService, Service); //try here
 };
-inherits(YamahaAVRPlatform.AudioDeviceService, Service);
+
+//inherits(YamahaAVRPlatform.AudioDeviceService, Service);
 
 
 YamahaAVRPlatform.prototype = {
