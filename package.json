@@ -27,7 +27,9 @@
     "yamaha-nodejs": "0.4.x",
     "mdns": "^2.2.4",
     "q": "1.4.x",
-    "debug": "^2.2.0"
+    "debug": "^2.2.0",
+    "core-util-is": "^1.0.1"
+
   },
   "author": "neonightmare <neonightmare@gmail.com> (https://github.com/neonightmare)",
   "license": "ISC",
