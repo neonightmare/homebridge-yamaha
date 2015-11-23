@@ -39,9 +39,25 @@ module.exports = function(homebridge) {
   Characteristic = homebridge.hap.Characteristic;
   types = homebridge.hapLegacyTypes;
 
+  fixInheritance(YamahaAVRPlatform.AudioVolume, Characteristic);
+  fixInheritance(YamahaAVRPlatform.Muting, Characteristic);
+  fixInheritance(YamahaAVRPlatform.AudioDeviceService, Service);
+
   homebridge.registerAccessory("homebridge-yamaha", "Yamaha", YamahaAVRAccessory);
   homebridge.registerPlatform("homebridge-yamaha", "Yamaha", YamahaAVRPlatform);
 }
+
+// Necessary because Accessory is defined after we have defined all of our classes
+function fixInheritance(subclass, superclass) {
+    var proto = subclass.prototype;
+    inherits(subclass, superclass);
+    subclass.prototype.parent = superclass.prototype;
+    for (var mn in proto) {
+        subclass.prototype[mn] = proto[mn];
+    }
+}
+
+
 
 function YamahaAVRPlatform(log, config){
     this.log = log;
@@ -70,7 +86,7 @@ YamahaAVRPlatform.AudioVolume = function() {
     perms: [Characteristic.Perms.READ, Characteristic.Perms.WRITE, Characteristic.Perms.NOTIFY]
   });
   this.value = this.getDefaultValue();
-  inherits(YamahaAVRPlatform.AudioVolume, Characteristic); //try here
+  //inherits(YamahaAVRPlatform.AudioVolume, Characteristic); //try here -> new fixInheritance
 };
 
 //inherits(YamahaAVRPlatform.AudioVolume, Characteristic);
@@ -82,10 +98,10 @@ YamahaAVRPlatform.Muting = function() {
     perms: [Characteristic.Perms.READ, Characteristic.Perms.WRITE, Characteristic.Perms.NOTIFY]
   });
   this.value = this.getDefaultValue();
+  //inherits(YamahaAVRPlatform.Muting, Characteristic); //try here -> new fixInheritance
 };
 
-
-(YamahaAVRPlatform.Muting, Characteristic);
+//inherits(YamahaAVRPlatform.Muting, Characteristic);
 
 YamahaAVRPlatform.AudioDeviceService = function(displayName, subtype) {
   Service.call(this, displayName, '00000001-0000-1000-8000-135D67EC4377', subtype);
@@ -95,7 +111,7 @@ YamahaAVRPlatform.AudioDeviceService = function(displayName, subtype) {
 
   // Optional Characteristics
   this.addOptionalCharacteristic(YamahaAVRPlatform.Muting);
-  inherits(YamahaAVRPlatform.AudioDeviceService, Service); //try here
+  //inherits(YamahaAVRPlatform.AudioDeviceService, Service); //try here -> new fixInheritance
 };
 
 //inherits(YamahaAVRPlatform.AudioDeviceService, Service);
