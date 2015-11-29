@@ -3,7 +3,7 @@ homebridge-plugin for Yamaha AVR control with Apple-Homekit.
 
 # Installation
 
-    sudo npm install -g https://gihub.com/neonightmare/homebridge-yamaha.git
+    npm install -g neonightmare/homebridge-yamaha
 
 #Configuration
 
