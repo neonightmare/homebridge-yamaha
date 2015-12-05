@@ -4,7 +4,7 @@ homebridge-plugin for Yamaha AVR control with Apple-Homekit.
 # Installation
 Follow the instruction in [NPM](https://www.npmjs.com/package/homebridge) for the homebridge server installation. The plugin is published through [NPM](https://www.npmjs.com/package/homebridge-yamaha) and should be installed "globally" by typing:
 
-    sudo npm install -g homebridge-yamaha
+    sudo npm install -g homebridge-yamaha 
 
 #Configuration
 
