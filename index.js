@@ -17,13 +17,8 @@ Configuration Sample:
 var request = require("request");
 var Service, Characteristic, types, hapLegacyTypes;
 
-//  var types = require("../api").homebridge.hapLegacyTypes;
- //var hapLegacyTypes = require("hap-nodejs/accessories/types.js");
-
 var inherits = require('util').inherits;
 var debug = require('debug')('YamahaAVR');
-//old  var Service = rearequire("../api").homebridge.hap.Service;
-//old  var Characteristic = require("../api").homebridge.hap.Characteristic;
 var Yamaha = require('yamaha-nodejs');
 var Q = require('q');
 var mdns = require('mdns');
@@ -86,10 +81,8 @@ YamahaAVRPlatform.AudioVolume = function() {
     perms: [Characteristic.Perms.READ, Characteristic.Perms.WRITE, Characteristic.Perms.NOTIFY]
   });
   this.value = this.getDefaultValue();
-  //inherits(YamahaAVRPlatform.AudioVolume, Characteristic); //try here -> new fixInheritance
 };
 
-//inherits(YamahaAVRPlatform.AudioVolume, Characteristic);
 
 YamahaAVRPlatform.Muting = function() {
   Characteristic.call(this, 'Muting', '00001002-0000-1000-8000-135D67EC4377');
@@ -98,10 +91,8 @@ YamahaAVRPlatform.Muting = function() {
     perms: [Characteristic.Perms.READ, Characteristic.Perms.WRITE, Characteristic.Perms.NOTIFY]
   });
   this.value = this.getDefaultValue();
-  //inherits(YamahaAVRPlatform.Muting, Characteristic); //try here -> new fixInheritance
 };
 
-//inherits(YamahaAVRPlatform.Muting, Characteristic);
 
 YamahaAVRPlatform.AudioDeviceService = function(displayName, subtype) {
   Service.call(this, displayName, '00000001-0000-1000-8000-135D67EC4377', subtype);
@@ -111,10 +102,7 @@ YamahaAVRPlatform.AudioDeviceService = function(displayName, subtype) {
 
   // Optional Characteristics
   this.addOptionalCharacteristic(YamahaAVRPlatform.Muting);
-  //inherits(YamahaAVRPlatform.AudioDeviceService, Service); //try here -> new fixInheritance
 };
-
-//inherits(YamahaAVRPlatform.AudioDeviceService, Service);
 
 
 YamahaAVRPlatform.prototype = {
@@ -285,6 +273,3 @@ YamahaAVRAccessory.prototype = {
 
     }
 };
-
-//module.exports.accessory = YamahaAVRAccessory;
-//module.exports.platform = YamahaAVRPlatform;
