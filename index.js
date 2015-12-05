@@ -43,8 +43,8 @@ module.exports = function(homebridge) {
   fixInheritance(YamahaAVRPlatform.Muting, Characteristic);
   fixInheritance(YamahaAVRPlatform.AudioDeviceService, Service);
 
-  homebridge.registerAccessory("homebridge-yamaha", "Yamaha", YamahaAVRAccessory);
-  homebridge.registerPlatform("homebridge-yamaha", "Yamaha", YamahaAVRPlatform);
+  homebridge.registerAccessory("homebridge-yamaha", "YamahaAVR", YamahaAVRAccessory);
+  homebridge.registerPlatform("homebridge-yamaha", "YamahaAVR", YamahaAVRPlatform);
 }
 
 // Necessary because Accessory is defined after we have defined all of our classes
