@@ -4,7 +4,7 @@ homebridge-plugin for Yamaha AVR control with Apple-Homekit.
 # Installation
 Follow the instruction in [NPM](https://www.npmjs.com/package/homebridge) for the homebridge server installation. The plugin is published through [NPM](https://www.npmjs.com/package/homebridge-yamaha) and should be installed "globally" by typing:
 
-    sudo npm install -g homebridge-yamaha 
+    sudo npm install -g homebridge-yamaha
 
 #Configuration
 
@@ -22,10 +22,8 @@ Example:
         "port": 51826,
         "pin": "031-45-154"
     },
-    "description": "This is an example configuration file for KNX platform shim",
+    "description": "This is an example configuration file for homebridge plugin for yamaha AVR",
     "hint": "Always paste into jsonlint.com validation page before starting your homebridge, saves a lot of frustration",
-    "hint2": "Replace all group addresses by current addresses of your installation, these are arbitrary examples!",
-    "hint3": "For valid services and their characteristics have a look at the knxdevice.md file in folder accessories!",
     "platforms": [
         {
             "platform": "YamahaAVR",
