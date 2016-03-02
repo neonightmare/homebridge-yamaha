@@ -140,6 +140,10 @@ YamahaAVRPlatform.prototype = {
                     if(accessories.length >= this.expectedDevices)
                         timeoutFunction(); // We're done, call the timeout function now.
                 }.bind(this)
+                ,
+                function(error){
+                    debug("DEBUG: Failed getSystemConfig from " + name + ", probably just not a Yamaha AVR.", error);
+                }.bind(this)
             );
         }.bind(this);
 
@@ -235,9 +239,13 @@ YamahaAVRAccessory.prototype = {
         var switchService = new Service.Switch("Power State");
         switchService.getCharacteristic(Characteristic.On)
                 .on('get', function(callback, context){
-                    yamaha.isOn().then(function(result){
-                        callback(false, result);
-                    }.bind(this));
+                    yamaha.isOn().then(
+                        function(result){
+                            callback(false, result);
+                        }.bind(this), function(error){
+                            callback(error, false);
+                        }.bind(this)
+                    );
                 }.bind(this))
                 .on('set', function(powerOn, callback){
                     this.setPlaying(powerOn).then(function(){
@@ -248,14 +256,17 @@ YamahaAVRAccessory.prototype = {
                 }.bind(this));
 
         var audioDeviceService = new YamahaAVRPlatform.AudioDeviceService("Audio Functions");
-        audioDeviceService.getCharacteristic(YamahaAVRPlatform.AudioVolume)
-                .on('get', function(callback, context){
-                    yamaha.getBasicInfo().done(function(basicInfo){
+        var volCx = audioDeviceService.getCharacteristic(YamahaAVRPlatform.AudioVolume);
+
+                volCx.on('get', function(callback, context){
+                    yamaha.getBasicInfo().then(function(basicInfo){
                         var v = basicInfo.getVolume()/10.0;
                         var p = 100 * ((v - that.minVolume) / that.gapVolume);
                         p = p < 0 ? 0 : p > 100 ? 100 : Math.round(p);
                         debug("Got volume percent of " + p + "%");
-                        callback(false, p);
+                        callback(false, volCx.value);
+                    }, function(error){
+                        callback(error, 0);
                     });
                 })
                 .on('set', function(p, callback){
@@ -264,6 +275,8 @@ YamahaAVRAccessory.prototype = {
                     debug("Setting volume to " + v);
                     yamaha.setVolumeTo(v).then(function(){
                         callback(false, p);
+                    }, function(error){
+                        callback(error, volCx.value);
                     });
                 })
                 .getValue(null, null); // force an asynchronous get
