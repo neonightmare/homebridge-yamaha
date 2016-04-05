@@ -61,6 +61,7 @@ function YamahaAVRPlatform(log, config){
     this.minVolume = config["min_volume"] || -50.0;
     this.maxVolume = config["max_volume"] || -20.0;
     this.gapVolume = this.maxVolume - this.minVolume;
+    this.allowMuting = config["allow_muting"] || "no";
     this.setMainInputTo = config["setMainInputTo"];
     this.expectedDevices = config["expected_devices"] || 100;
     this.discoveryTimeout = config["discovery_timeout"] || 30;
@@ -77,7 +78,6 @@ YamahaAVRPlatform.AudioVolume = function() {
     unit: Characteristic.Units.PERCENTAGE,
     maxValue: 100,
     minValue: 0,
-    minStep: 1,
     perms: [Characteristic.Perms.READ, Characteristic.Perms.WRITE, Characteristic.Perms.NOTIFY]
   });
   this.value = this.getDefaultValue();
@@ -87,7 +87,7 @@ YamahaAVRPlatform.AudioVolume = function() {
 YamahaAVRPlatform.Muting = function() {
   Characteristic.call(this, 'Muting', '00001002-0000-1000-8000-135D67EC4377');
   this.setProps({
-    format: Characteristic.Formats.UINT8,
+    format: Characteristic.Formats.BOOL,
     perms: [Characteristic.Perms.READ, Characteristic.Perms.WRITE, Characteristic.Perms.NOTIFY]
   });
   this.value = this.getDefaultValue();
@@ -197,6 +197,7 @@ function YamahaAVRAccessory(log, config, name, yamaha, sysConfig) {
     this.minVolume = config["min_volume"] || -50.0;
     this.maxVolume = config["max_volume"] || -20.0;
     this.gapVolume = this.maxVolume - this.minVolume;
+    this.allowMuting = config["allow_muting"] || "no";
 }
 
 YamahaAVRAccessory.prototype = {
@@ -281,6 +282,38 @@ YamahaAVRAccessory.prototype = {
                 })
                 .getValue(null, null); // force an asynchronous get
 
+
+        // Add Muting Characteristic if enabled in config
+        if(this.allowMuting == "yes") {
+
+          audioDeviceService.addCharacteristic(YamahaAVRPlatform.Muting);
+          var mutingCx = audioDeviceService.getCharacteristic(YamahaAVRPlatform.Muting);
+    
+          mutingCx.on('get', function(callback, context) {
+              yamaha.getBasicInfo().then(function(basicInfo){
+                callback(false, basicInfo.isMuted());
+              }, function(error){
+                callback(error, 0);
+              });
+            })
+            .on('set', function(v, callback){
+              var mute_xml = '<YAMAHA_AV cmd="PUT"><Main_Zone><Volume><Mute>';
+              if(v) {
+                mute_xml += 'On';
+              } else {
+                mute_xml += 'Off';
+              }
+              mute_xml += '</Mute></Volume></Main_Zone></YAMAHA_AV>';
+
+              yamaha.SendXMLToReceiver(mute_xml).then(function(){
+                callback(false, v);
+              }, function(error){
+                callback(error, mutingCx.value);
+              });
+            })
+            .getValue(null, null); // force an asynchronous get
+
+        }
 
         return [informationService, switchService, audioDeviceService];
 

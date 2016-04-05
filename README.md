@@ -29,6 +29,7 @@ Example:
             "platform": "YamahaAVR",
             "play_volume": -48,
             "setMainInputTo": "Airplay",
+            "allow_muting": "yes",
             "manual_addresses": {
                 "Yamaha": "192.168.1.115"
             }
