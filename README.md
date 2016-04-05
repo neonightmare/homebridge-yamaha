@@ -30,6 +30,7 @@ Example:
             "play_volume": -48,
             "setMainInputTo": "Airplay",
             "allow_muting": "yes",
+            "show_input_name": "yes",
             "manual_addresses": {
                 "Yamaha": "192.168.1.115"
             }

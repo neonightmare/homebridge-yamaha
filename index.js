@@ -38,6 +38,10 @@ module.exports = function(homebridge) {
   fixInheritance(YamahaAVRPlatform.Muting, Characteristic);
   fixInheritance(YamahaAVRPlatform.AudioDeviceService, Service);
 
+  fixInheritance(YamahaAVRPlatform.Input, Characteristic);
+  fixInheritance(YamahaAVRPlatform.InputName, Characteristic);
+  fixInheritance(YamahaAVRPlatform.InputService, Service);
+
   homebridge.registerAccessory("homebridge-yamaha", "YamahaAVR", YamahaAVRAccessory);
   homebridge.registerPlatform("homebridge-yamaha", "YamahaAVR", YamahaAVRPlatform);
 }
@@ -62,6 +66,7 @@ function YamahaAVRPlatform(log, config){
     this.maxVolume = config["max_volume"] || -20.0;
     this.gapVolume = this.maxVolume - this.minVolume;
     this.allowMuting = config["allow_muting"] || "no";
+    this.showInputName = config["show_input_name"] || "no";
     this.setMainInputTo = config["setMainInputTo"];
     this.expectedDevices = config["expected_devices"] || 100;
     this.discoveryTimeout = config["discovery_timeout"] || 30;
@@ -78,7 +83,6 @@ YamahaAVRPlatform.AudioVolume = function() {
     unit: Characteristic.Units.PERCENTAGE,
     maxValue: 100,
     minValue: 0,
-    minStep: 1,
     perms: [Characteristic.Perms.READ, Characteristic.Perms.WRITE, Characteristic.Perms.NOTIFY]
   });
   this.value = this.getDefaultValue();
@@ -103,6 +107,37 @@ YamahaAVRPlatform.AudioDeviceService = function(displayName, subtype) {
 
   // Optional Characteristics
   this.addOptionalCharacteristic(YamahaAVRPlatform.Muting);
+};
+
+
+YamahaAVRPlatform.Input = function() {
+  Characteristic.call(this, 'Input', '00001003-0000-1000-8000-135D67EC4377');
+  this.setProps({
+    format: Characteristic.Formats.STRING,
+    perms: [Characteristic.Perms.READ, Characteristic.Perms.NOTIFY]
+  });
+  this.value = this.getDefaultValue();
+};
+
+
+YamahaAVRPlatform.InputName = function() {
+  Characteristic.call(this, 'Input Name', '00001004-0000-1000-8000-135D67EC4377');
+  this.setProps({
+    format: Characteristic.Formats.STRING,
+    perms: [Characteristic.Perms.READ, Characteristic.Perms.NOTIFY]
+  });
+  this.value = this.getDefaultValue();
+};
+
+
+YamahaAVRPlatform.InputService = function(displayName, subtype) {
+  Service.call(this, displayName, '00000002-0000-1000-8000-135D67EC4377', subtype);
+
+  // Required Characteristics
+  this.addCharacteristic(YamahaAVRPlatform.Input);
+
+  // Optional Characteristics
+  this.addOptionalCharacteristic(YamahaAVRPlatform.InputName);
 };
 
 
@@ -199,6 +234,7 @@ function YamahaAVRAccessory(log, config, name, yamaha, sysConfig) {
     this.maxVolume = config["max_volume"] || -20.0;
     this.gapVolume = this.maxVolume - this.minVolume;
     this.allowMuting = config["allow_muting"] || "no";
+    this.showInputName = config["show_input_name"] || "no";
 }
 
 YamahaAVRAccessory.prototype = {
@@ -316,7 +352,35 @@ YamahaAVRAccessory.prototype = {
 
         }
 
-        return [informationService, switchService, audioDeviceService];
+
+        var inputService = new YamahaAVRPlatform.InputService("Input Functions");
+
+        var inputCx = inputService.getCharacteristic(YamahaAVRPlatform.Input);
+        inputCx.on('get', function(callback, context) {
+          yamaha.getBasicInfo().then(function(basicInfo){
+            callback(false, basicInfo.getCurrentInput());
+          }, function(error){
+            callback(error, 0);
+          });
+        })
+        .getValue(null, null); // force an asynchronous get
+        
+        if(this.showInputName == "yes") {
+          inputService.addCharacteristic(YamahaAVRPlatform.InputName);
+          var nameCx = inputService.getCharacteristic(YamahaAVRPlatform.InputName);
+          nameCx.on('get', function(callback, context) {
+            yamaha.getBasicInfo().then(function(basicInfo){
+              var name = basicInfo.YAMAHA_AV.Main_Zone[0].Basic_Status[0].Input[0].Input_Sel_Item_Info[0].Src_Name[0];
+              name = name.replace('Osdname:', '');
+              callback(false, name);
+            }, function(error){
+              callback(error, 0);
+            });
+          })
+          .getValue(null, null); // force an asynchronous get
+        }
+
+        return [informationService, switchService, audioDeviceService, inputService];
 
     }
 };
