@@ -265,7 +265,7 @@ YamahaAVRAccessory.prototype = {
                         var p = 100 * ((v - that.minVolume) / that.gapVolume);
                         p = p < 0 ? 0 : p > 100 ? 100 : Math.round(p);
                         debug("Got volume percent of " + p + "%");
-                        callback(false, volCx.value);
+                        callback(false, p);
                     }, function(error){
                         callback(error, 0);
                     });
