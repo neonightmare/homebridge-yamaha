@@ -83,6 +83,7 @@ YamahaAVRPlatform.AudioVolume = function() {
     unit: Characteristic.Units.PERCENTAGE,
     maxValue: 100,
     minValue: 0,
+    minStep: 1,
     perms: [Characteristic.Perms.READ, Characteristic.Perms.WRITE, Characteristic.Perms.NOTIFY]
   });
   this.value = this.getDefaultValue();
