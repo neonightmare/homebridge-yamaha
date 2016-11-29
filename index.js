@@ -57,6 +57,7 @@ function fixInheritance(subclass, superclass) {
 function YamahaAVRPlatform(log, config){
     this.log = log;
     this.config = config;
+    this.zone = config["zone"] || "Main";
     this.playVolume = config["play_volume"];
     this.minVolume = config["min_volume"] || -50.0;
     this.maxVolume = config["max_volume"] || -20.0;
@@ -187,6 +188,7 @@ function YamahaAVRAccessory(log, config, name, yamaha, sysConfig) {
     this.sysConfig = sysConfig;
 
     this.nameSuffix = config["name_suffix"] || " Speakers";
+    this.zone = config["zone"] || 1;
     this.name = name;
     this.serviceName = name + this.nameSuffix;
     this.setMainInputTo = config["setMainInputTo"];
@@ -206,7 +208,7 @@ YamahaAVRAccessory.prototype = {
         if (playing) {
 
             return yamaha.powerOn().then(function(){
-                if (that.playVolume) return yamaha.setVolumeTo(that.playVolume*10);
+                if (that.playVolume) return yamaha.setVolumeTo(that.playVolume*10, that.zone);
                 else return Q();
             }).then(function(){
                 if (that.setMainInputTo) return yamaha.setMainInputTo(that.setMainInputTo);
@@ -258,7 +260,7 @@ YamahaAVRAccessory.prototype = {
 		var volCx = audioDeviceService.getCharacteristic(Characteristic.Volume);
 
                 volCx.on('get', function(callback, context){
-                    yamaha.getBasicInfo().then(function(basicInfo){
+                    yamaha.getBasicInfo(that.zone).then(function(basicInfo){
                         var v = basicInfo.getVolume()/10.0;
                         var p = 100 * ((v - that.minVolume) / that.gapVolume);
                         p = p < 0 ? 0 : p > 100 ? 100 : Math.round(p);
@@ -272,7 +274,7 @@ YamahaAVRAccessory.prototype = {
                     var v = ((p / 100) * that.gapVolume) + that.minVolume;
                     v = Math.round(v*10.0);
                     debug("Setting volume to " + v);
-                    yamaha.setVolumeTo(v).then(function(){
+                    yamaha.setVolumeTo(v,that.zone).then(function(){
                         callback(false, p);
                     }, function(error){
                         callback(error, volCx.value);
@@ -283,20 +285,25 @@ YamahaAVRAccessory.prototype = {
 		var mutingCx = audioDeviceService.getCharacteristic(Characteristic.Mute);
     
           mutingCx.on('get', function(callback, context) {
-              yamaha.getBasicInfo().then(function(basicInfo){
+              yamaha.getBasicInfo(that.zone).then(function(basicInfo){
                 callback(false, basicInfo.isMuted());
               }, function(error){
                 callback(error, 0);
               });
             })
             .on('set', function(v, callback){
-              var mute_xml = '<YAMAHA_AV cmd="PUT"><Main_Zone><Volume><Mute>';
+			  var zone_name = 'Main_Zone';
+			  if(that.zone != 1) {
+				  zone_name = 'Zone_'+that.zone;
+			  }
+			  
+			  var mute_xml = '<YAMAHA_AV cmd="PUT"><'+zone_name+'><Volume><Mute>';
               if(v) {
                 mute_xml += 'On';
               } else {
                 mute_xml += 'Off';
               }
-              mute_xml += '</Mute></Volume></Main_Zone></YAMAHA_AV>';
+              mute_xml += '</Mute></Volume></'+zone_name+'></YAMAHA_AV>';
 
               yamaha.SendXMLToReceiver(mute_xml).then(function(){
                 callback(false, v);

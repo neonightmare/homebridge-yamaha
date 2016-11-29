@@ -8,7 +8,7 @@
   },
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/zauberermd/homebridge-yamaha.git"
+    "url": "git+https://github.com/neonightmare/homebridge-yamaha.git"
   },
   "preferGlobal": true,
   "keywords": [
