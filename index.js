@@ -34,8 +34,8 @@ module.exports = function(homebridge) {
   Characteristic = homebridge.hap.Characteristic;
   types = homebridge.hapLegacyTypes;
 
-  fixInheritance(YamahaAVRPlatform.AudioVolume, Characteristic);
-  fixInheritance(YamahaAVRPlatform.Muting, Characteristic);
+  //fixInheritance(YamahaAVRPlatform.AudioVolume, Characteristic);
+  //fixInheritance(YamahaAVRPlatform.Muting, Characteristic);
   fixInheritance(YamahaAVRPlatform.AudioDeviceService, Service);
 
   fixInheritance(YamahaAVRPlatform.Input, Characteristic);
@@ -76,7 +76,7 @@ function YamahaAVRPlatform(log, config){
 
 // Custom Characteristics and service...
 
-YamahaAVRPlatform.AudioVolume = function() {
+/*YamahaAVRPlatform.AudioVolume = function() {
   Characteristic.call(this, 'Audio Volume', '00001001-0000-1000-8000-135D67EC4377');
   this.setProps({
     format: Characteristic.Formats.UINT8,
@@ -87,27 +87,29 @@ YamahaAVRPlatform.AudioVolume = function() {
     perms: [Characteristic.Perms.READ, Characteristic.Perms.WRITE, Characteristic.Perms.NOTIFY]
   });
   this.value = this.getDefaultValue();
-};
+};*/
 
 
-YamahaAVRPlatform.Muting = function() {
+/*YamahaAVRPlatform.Muting = function() {
   Characteristic.call(this, 'Muting', '00001002-0000-1000-8000-135D67EC4377');
   this.setProps({
     format: Characteristic.Formats.BOOL,
     perms: [Characteristic.Perms.READ, Characteristic.Perms.WRITE, Characteristic.Perms.NOTIFY]
   });
   this.value = this.getDefaultValue();
-};
+};*/
 
 
 YamahaAVRPlatform.AudioDeviceService = function(displayName, subtype) {
   Service.call(this, displayName, '00000001-0000-1000-8000-135D67EC4377', subtype);
 
   // Required Characteristics
-  this.addCharacteristic(YamahaAVRPlatform.AudioVolume);
+  //this.addCharacteristic(YamahaAVRPlatform.AudioVolume);
+  this.addCharacteristic(Characteristic.Volume);
 
   // Optional Characteristics
-  this.addOptionalCharacteristic(YamahaAVRPlatform.Muting);
+  //this.addOptionalCharacteristic(YamahaAVRPlatform.Muting);
+  this.addOptionalCharacteristic(Characteristic.Mute);
 };
 
 
@@ -295,7 +297,8 @@ YamahaAVRAccessory.prototype = {
                 }.bind(this));
 
         var audioDeviceService = new YamahaAVRPlatform.AudioDeviceService("Audio Functions");
-        var volCx = audioDeviceService.getCharacteristic(YamahaAVRPlatform.AudioVolume);
+        //var volCx = audioDeviceService.getCharacteristic(YamahaAVRPlatform.AudioVolume);
+		var volCx = audioDeviceService.getCharacteristic(Characteristic.Volume);
 
                 volCx.on('get', function(callback, context){
                     yamaha.getBasicInfo().then(function(basicInfo){
@@ -324,8 +327,10 @@ YamahaAVRAccessory.prototype = {
         // Add Muting Characteristic if enabled in config
         if(this.allowMuting == "yes") {
 
-          audioDeviceService.addCharacteristic(YamahaAVRPlatform.Muting);
-          var mutingCx = audioDeviceService.getCharacteristic(YamahaAVRPlatform.Muting);
+          //audioDeviceService.addCharacteristic(YamahaAVRPlatform.Muting);
+          //var mutingCx = audioDeviceService.getCharacteristic(YamahaAVRPlatform.Muting);
+		  audioDeviceService.addCharacteristic(Characteristic.Mute);
+		  var mutingCx = audioDeviceService.getCharacteristic(Characteristic.Mute);
     
           mutingCx.on('get', function(callback, context) {
               yamaha.getBasicInfo().then(function(basicInfo){
