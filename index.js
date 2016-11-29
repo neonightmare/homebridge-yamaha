@@ -34,10 +34,6 @@ module.exports = function(homebridge) {
   Characteristic = homebridge.hap.Characteristic;
   types = homebridge.hapLegacyTypes;
 
-  //fixInheritance(YamahaAVRPlatform.AudioVolume, Characteristic);
-  //fixInheritance(YamahaAVRPlatform.Muting, Characteristic);
-  fixInheritance(YamahaAVRPlatform.AudioDeviceService, Service);
-
   fixInheritance(YamahaAVRPlatform.Input, Characteristic);
   fixInheritance(YamahaAVRPlatform.InputName, Characteristic);
   fixInheritance(YamahaAVRPlatform.InputService, Service);
@@ -65,7 +61,6 @@ function YamahaAVRPlatform(log, config){
     this.minVolume = config["min_volume"] || -50.0;
     this.maxVolume = config["max_volume"] || -20.0;
     this.gapVolume = this.maxVolume - this.minVolume;
-    this.allowMuting = config["allow_muting"] || "no";
     this.showInputName = config["show_input_name"] || "no";
     this.setMainInputTo = config["setMainInputTo"];
     this.expectedDevices = config["expected_devices"] || 100;
@@ -75,43 +70,6 @@ function YamahaAVRPlatform(log, config){
 }
 
 // Custom Characteristics and service...
-
-/*YamahaAVRPlatform.AudioVolume = function() {
-  Characteristic.call(this, 'Audio Volume', '00001001-0000-1000-8000-135D67EC4377');
-  this.setProps({
-    format: Characteristic.Formats.UINT8,
-    unit: Characteristic.Units.PERCENTAGE,
-    maxValue: 100,
-    minValue: 0,
-    minStep: 1,
-    perms: [Characteristic.Perms.READ, Characteristic.Perms.WRITE, Characteristic.Perms.NOTIFY]
-  });
-  this.value = this.getDefaultValue();
-};*/
-
-
-/*YamahaAVRPlatform.Muting = function() {
-  Characteristic.call(this, 'Muting', '00001002-0000-1000-8000-135D67EC4377');
-  this.setProps({
-    format: Characteristic.Formats.BOOL,
-    perms: [Characteristic.Perms.READ, Characteristic.Perms.WRITE, Characteristic.Perms.NOTIFY]
-  });
-  this.value = this.getDefaultValue();
-};*/
-
-
-YamahaAVRPlatform.AudioDeviceService = function(displayName, subtype) {
-  Service.call(this, displayName, '00000001-0000-1000-8000-135D67EC4377', subtype);
-
-  // Required Characteristics
-  //this.addCharacteristic(YamahaAVRPlatform.AudioVolume);
-  this.addCharacteristic(Characteristic.Volume);
-
-  // Optional Characteristics
-  //this.addOptionalCharacteristic(YamahaAVRPlatform.Muting);
-  this.addOptionalCharacteristic(Characteristic.Mute);
-};
-
 
 YamahaAVRPlatform.Input = function() {
   Characteristic.call(this, 'Input', '00001003-0000-1000-8000-135D67EC4377');
@@ -236,7 +194,6 @@ function YamahaAVRAccessory(log, config, name, yamaha, sysConfig) {
     this.minVolume = config["min_volume"] || -50.0;
     this.maxVolume = config["max_volume"] || -20.0;
     this.gapVolume = this.maxVolume - this.minVolume;
-    this.allowMuting = config["allow_muting"] || "no";
     this.showInputName = config["show_input_name"] || "no";
 }
 
@@ -277,7 +234,7 @@ YamahaAVRAccessory.prototype = {
                 .setCharacteristic(Characteristic.Model, this.sysConfig.YAMAHA_AV.System[0].Config[0].Model_Name[0])
                 .setCharacteristic(Characteristic.SerialNumber, this.sysConfig.YAMAHA_AV.System[0].Config[0].System_ID[0]);
 
-        var switchService = new Service.Switch("Power State");
+        var switchService = new Service.Switch("Yamaha Power");
         switchService.getCharacteristic(Characteristic.On)
                 .on('get', function(callback, context){
                     yamaha.isOn().then(
@@ -296,8 +253,8 @@ YamahaAVRAccessory.prototype = {
                     });
                 }.bind(this));
 
-        var audioDeviceService = new YamahaAVRPlatform.AudioDeviceService("Audio Functions");
-        //var volCx = audioDeviceService.getCharacteristic(YamahaAVRPlatform.AudioVolume);
+		var audioDeviceService = new Service.Speaker("Speaker");
+		audioDeviceService.addCharacteristic(Characteristic.Volume);
 		var volCx = audioDeviceService.getCharacteristic(Characteristic.Volume);
 
                 volCx.on('get', function(callback, context){
@@ -323,14 +280,7 @@ YamahaAVRAccessory.prototype = {
                 })
                 .getValue(null, null); // force an asynchronous get
 
-
-        // Add Muting Characteristic if enabled in config
-        if(this.allowMuting == "yes") {
-
-          //audioDeviceService.addCharacteristic(YamahaAVRPlatform.Muting);
-          //var mutingCx = audioDeviceService.getCharacteristic(YamahaAVRPlatform.Muting);
-		  audioDeviceService.addCharacteristic(Characteristic.Mute);
-		  var mutingCx = audioDeviceService.getCharacteristic(Characteristic.Mute);
+		var mutingCx = audioDeviceService.getCharacteristic(Characteristic.Mute);
     
           mutingCx.on('get', function(callback, context) {
               yamaha.getBasicInfo().then(function(basicInfo){
@@ -355,8 +305,6 @@ YamahaAVRAccessory.prototype = {
               });
             })
             .getValue(null, null); // force an asynchronous get
-
-        }
 
 
         var inputService = new YamahaAVRPlatform.InputService("Input Functions");
