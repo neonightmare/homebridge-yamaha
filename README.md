@@ -11,6 +11,7 @@ Follow the instruction in [NPM](https://www.npmjs.com/package/homebridge) for th
 config.json
 
 "manual_addresses" only needed if Bonjour/Autodetection doesn't work.
+"zones_as_accessories" only needed if you have multiple speaker zones that you want to be exposed as seperate accessories to HomeKit.
 
 Example:
 
@@ -28,9 +29,19 @@ Example:
         {
             "platform": "YamahaAVR",
             "play_volume": -48,
-            "setMainInputTo": "Airplay",
+            "set_input_to": "Airplay",
             "manual_addresses": {
                 "Yamaha": "192.168.1.115"
+            },
+            "zones_as_accessories": {
+                "Yamaha": {
+                    "1": {
+                        "name":"Main"
+                    },
+                    "2": {
+                        "name":"Zone 2"
+                    }
+                }
             }
         }
     ],
