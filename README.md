@@ -11,6 +11,7 @@ Follow the instruction in [NPM](https://www.npmjs.com/package/homebridge) for th
 config.json
 
 "manual_addresses" only needed if Bonjour/Autodetection doesn't work.
+
 "zones_as_accessories" only needed if you have multiple speaker zones that you want to be exposed as seperate accessories to HomeKit.
 
 Example:
