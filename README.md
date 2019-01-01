@@ -4,13 +4,17 @@ homebridge-plugin for Yamaha AVR control with Apple-Homekit.
 # Installation
 Follow the instruction in [NPM](https://www.npmjs.com/package/homebridge) for the homebridge server installation. The plugin is published through [NPM](https://www.npmjs.com/package/homebridge-yamaha) and should be installed "globally" by typing:
 
-    sudo npm install -g homebridge-yamaha
+```
+sudo npm install -g homebridge-yamaha
+```
 
-#Configuration
+# Configuration
 
-config.json
+## config.json
 
-"manual_addresses" only needed if Bonjour/Autodetection doesn't work.
+`"manual_addresses"` only needed if Bonjour/Autodetection doesn't work.
+
+`"zones_as_accessories"` only needed if you have multiple speaker zones that you want to be exposed as seperate accessories to HomeKit.
 
 Example:
 
@@ -28,9 +32,19 @@ Example:
         {
             "platform": "YamahaAVR",
             "play_volume": -48,
-            "setMainInputTo": "Airplay",
+            "set_input_to": "Airplay",
             "manual_addresses": {
                 "Yamaha": "192.168.1.115"
+            },
+            "zones_as_accessories": {
+                "Yamaha": {
+                    "1": {
+                        "name":"Main"
+                    },
+                    "2": {
+                        "name":"Zone 2"
+                    }
+                }
             }
         }
     ],

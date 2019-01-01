@@ -7,9 +7,20 @@ Configuration Sample:
         {
             "platform": "YamahaAVR",
             "play_volume": -48,
-            "setMainInputTo": "Airplay",
+            "set_input_to": "Airplay",
             "manual_addresses": {
-            "Yamaha": "192.168.1.115"}
+                "Yamaha": "192.168.1.115"
+            },
+            "zones_as_accessories": {
+                "Yamaha": {
+                    "1": {
+                        "name":"Main"
+                    },
+                    "2": {
+                        "name":"Zone 2"
+                    }
+                }
+            }
         }
 
 */
@@ -56,15 +67,17 @@ function fixInheritance(subclass, superclass) {
 
 function YamahaAVRPlatform(log, config){
     this.log = log;
+    this.log.prefix = "YamahaAVR";
     this.config = config;
     this.playVolume = config["play_volume"];
     this.minVolume = config["min_volume"] || -50.0;
     this.maxVolume = config["max_volume"] || -20.0;
     this.gapVolume = this.maxVolume - this.minVolume;
-    this.setMainInputTo = config["setMainInputTo"];
+    this.setInputTo = config["set_input_to"] || config["setMainInputTo"];
     this.expectedDevices = config["expected_devices"] || 100;
     this.discoveryTimeout = config["discovery_timeout"] || 30;
     this.manualAddresses = config["manual_addresses"] || {};
+    this.zoneAccessories = config["zones_as_accessories"] || {};
     this.browser = mdns.createBrowser(mdns.tcp('http'), {resolverSequence: sequence});
 }
 
@@ -107,7 +120,7 @@ YamahaAVRPlatform.AudioDeviceService = function(displayName, subtype) {
 
 YamahaAVRPlatform.prototype = {
     accessories: function(callback) {
-        this.log("Getting Yamaha AVR devices.");
+        this.log.info("Getting Yamaha AVR devices.");
         var that = this;
 
         var browser = this.browser;
@@ -121,7 +134,7 @@ YamahaAVRPlatform.prototype = {
 
         var setupFromService = function(service){
             var name = service.name;
-            //console.log('Found HTTP service "' + name + '"');
+            //console.log.info('Found HTTP service "' + name + '"');
             // We can't tell just from mdns if this is an AVR...
             if (service.port != 80) return; // yamaha-nodejs assumes this, so finding one on another port wouldn't do any good anyway.
             var yamaha = new Yamaha(service.host);
@@ -130,15 +143,33 @@ YamahaAVRPlatform.prototype = {
                     var sysModel = sysConfig.YAMAHA_AV.System[0].Config[0].Model_Name[0];
                     var sysId = sysConfig.YAMAHA_AV.System[0].Config[0].System_ID[0];
                     if(sysIds[sysId]){
-                        this.log("WARN: Got multiple systems with ID " + sysId + "! Omitting duplicate!");
+                        this.log.warn("WARN: Got multiple systems with ID " + sysId + "! Omitting duplicate!");
                         return;
                     }
                     sysIds[sysId] = true;
-                    this.log("Found Yamaha " + sysModel + " - " + sysId + ", \"" + name + "\"");
-                    var accessory = new YamahaAVRAccessory(this.log, this.config, name, yamaha, sysConfig);
-                    accessories.push(accessory);
-                    if(accessories.length >= this.expectedDevices)
-                        timeoutFunction(); // We're done, call the timeout function now.
+                    this.log.info("Found Yamaha " + sysModel + " - " + sysId + ", \"" + name + "\"");
+                    // TODO: use first zoneAccessories if 'name' is not found
+                    if (this.zoneAccessories.hasOwnProperty(name)) {
+                        for (var key in this.zoneAccessories) {
+                            var zones = this.zoneAccessories[key];
+                            for (var key in zones) {
+                                var zoneConfig = zones[key];
+                                var zone = parseInt(key);
+                                var accname = zoneConfig["name"];
+                                this.log.info("Making accessory \"" + accname + "\" for zone " + zone );
+                                var accessory = new YamahaAVRAccessory(this.log, zoneConfig, accname, yamaha, sysConfig, zone);
+                                accessories.push(accessory);
+                                if(accessories.length >= this.expectedDevices)
+                                    timeoutFunction(); // We're done, call the timeout function now.
+                            }
+                        }
+                    } else {
+                        this.log.info("Making default accessory \"" + name + "\" for main zone");
+                        var accessory = new YamahaAVRAccessory(this.log, this.config, name, yamaha, sysConfig, "1");
+                        accessories.push(accessory);
+                        if(accessories.length >= this.expectedDevices)
+                            timeoutFunction(); // We're done, call the timeout function now.
+                    }
                 }.bind(this)
                 ,
                 function(error){
@@ -168,7 +199,7 @@ YamahaAVRPlatform.prototype = {
             } else {
                 timeElapsed += checkCyclePeriod;
                 if(timeElapsed > that.discoveryTimeout * 1000){
-                    that.log("Waited " + that.discoveryTimeout + " seconds, stopping discovery.");
+                    that.log.warn("Waited " + that.discoveryTimeout + " seconds, stopping discovery.");
                 } else {
                     timer = setTimeout(timeoutFunction, checkCyclePeriod);
                     return;
@@ -176,23 +207,25 @@ YamahaAVRPlatform.prototype = {
             }
             browser.stop();
             browser.removeAllListeners('serviceUp');
-            that.log("Discovery finished, found " + accessories.length + " Yamaha AVR devices.");
+            that.log.info("Discovery finished, found " + accessories.length + " Yamaha AVR devices.");
             callback(accessories);
         };
         timer = setTimeout(timeoutFunction, checkCyclePeriod);
     }
 };
 
-function YamahaAVRAccessory(log, config, name, yamaha, sysConfig) {
+function YamahaAVRAccessory(log, config, name, yamaha, sysConfig, zone) {
     this.log = log;
     this.config = config;
     this.yamaha = yamaha;
     this.sysConfig = sysConfig;
+    this.zone = zone;
 
     this.nameSuffix = config["name_suffix"] || " Speakers";
     this.name = name;
-    this.serviceName = name + this.nameSuffix;
-    this.setMainInputTo = config["setMainInputTo"];
+    this.powerStateName = config["power_state_name"] || (name + " Power");
+    this.audioFunctionsName = config["audio_functions_name"] || (name + " Audio");
+    this.setInputTo = config["set_input_to"] || config["setMainInputTo"];
     this.playVolume = this.config["play_volume"];
     this.minVolume = config["min_volume"] || -50.0;
     this.maxVolume = config["max_volume"] || -20.0;
@@ -207,21 +240,22 @@ YamahaAVRAccessory.prototype = {
 
         if (playing) {
 
-            return yamaha.powerOn().then(function(){
-                if (that.playVolume) return yamaha.setVolumeTo(that.playVolume*10);
+            return yamaha.powerOn(that.zone).then(function(){
+                if (that.playVolume) return yamaha.setVolumeTo(that.playVolume*10, that.zone);
                 else return Q();
             }).then(function(){
-                if (that.setMainInputTo) return yamaha.setMainInputTo(that.setMainInputTo);
+                if (that.setInputTo) return yamaha.setInputTo(that.setInputTo, that.zone);
                 else return Q();
             }).then(function(){
-                if (that.setMainInputTo == "AirPlay") return yamaha.SendXMLToReceiver(
+                // TODO: Wrap <AirPlay> with Zone tags?
+                if (that.setInputTo == "AirPlay") return yamaha.SendXMLToReceiver(
                     '<YAMAHA_AV cmd="PUT"><AirPlay><Play_Control><Playback>Play</Playback></Play_Control></AirPlay></YAMAHA_AV>'
                 );
                 else return Q();
             });
         }
         else {
-            return yamaha.powerOff();
+            return yamaha.powerOff(that.zone);
         }
     },
 
@@ -236,10 +270,10 @@ YamahaAVRAccessory.prototype = {
                 .setCharacteristic(Characteristic.Model, this.sysConfig.YAMAHA_AV.System[0].Config[0].Model_Name[0])
                 .setCharacteristic(Characteristic.SerialNumber, this.sysConfig.YAMAHA_AV.System[0].Config[0].System_ID[0]);
 
-        var switchService = new Service.Switch("Power State");
+        var switchService = new Service.Switch(this.powerStateName);
         switchService.getCharacteristic(Characteristic.On)
                 .on('get', function(callback, context){
-                    yamaha.isOn().then(
+                    yamaha.isOn(that.zone).then(
                         function(result){
                             callback(false, result);
                         }.bind(this), function(error){
@@ -255,11 +289,11 @@ YamahaAVRAccessory.prototype = {
                     });
                 }.bind(this));
 
-        var audioDeviceService = new YamahaAVRPlatform.AudioDeviceService("Audio Functions");
+        var audioDeviceService = new YamahaAVRPlatform.AudioDeviceService(this.audioFunctionsName);
         var volCx = audioDeviceService.getCharacteristic(YamahaAVRPlatform.AudioVolume);
 
                 volCx.on('get', function(callback, context){
-                    yamaha.getBasicInfo().then(function(basicInfo){
+                    yamaha.getBasicInfo(that.zone).then(function(basicInfo){
                         var v = basicInfo.getVolume()/10.0;
                         var p = 100 * ((v - that.minVolume) / that.gapVolume);
                         p = p < 0 ? 0 : p > 100 ? 100 : Math.round(p);
@@ -273,14 +307,13 @@ YamahaAVRAccessory.prototype = {
                     var v = ((p / 100) * that.gapVolume) + that.minVolume;
                     v = Math.round(v*10.0);
                     debug("Setting volume to " + v);
-                    yamaha.setVolumeTo(v).then(function(){
+                    yamaha.setVolumeTo(v, that.zone).then(function(){
                         callback(false, p);
                     }, function(error){
                         callback(error, volCx.value);
                     });
                 })
                 .getValue(null, null); // force an asynchronous get
-
 
         return [informationService, switchService, audioDeviceService];
 
